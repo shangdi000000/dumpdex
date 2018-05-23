@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <entry key="ijiami">libexec.so,libexecmain.so</entry>
+    <entry key="apkprotect">apkprotect.com,libAPKProtect.so</entry>
+    <entry key="360">libprotectClass.so,libprotectClass_x86.so,libjiagu.so,libjiagu_art.so,libjiagu.so,libjiagu_x86.so</entry>
+    <entry key="bangbang">libDexHelper.so,libDexHelper-x86.so</entry>
+    <entry key="tp">libtup.so,libshell.so</entry>
+    <entry key="baidu">libbaiduprotect.so,ibbaiduprotect_x86.so</entry>
+    <entry key="najia">libddog.so,libfdog.so,libchaosvmp.so</entry>
+    <entry key="wangqin">libnqshieldx86.so,libnqshield.so</entry>
+    <entry key="ali">libmobisec.so,libmobisecx.so</entry>
+    <entry key="tfd">libegis.so</entry>
+</map>

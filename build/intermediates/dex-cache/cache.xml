@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/huan/Documents/github/demo/libdump/build/intermediates/intermediate-jars/release/classes.jar"
+        jumboMode="false"
+        min-sdk-version="16"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4b2b68be6da04cb789a3f0adcdd9e729f78e5b16">
+        <dex dex="/Users/huan/Documents/github/demo/app/build/intermediates/transforms/preDex/release/21.jar" />
+    </item>
+
+</items>

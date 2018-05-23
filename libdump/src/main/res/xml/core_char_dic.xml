@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map>
+    <entry key="move">M</entry>
+    <entry key="move-exception">M</entry>
+    <entry key="move-object">M</entry>
+    <entry key="move-object/16">M</entry>
+    <entry key="move-object/from16">M</entry>
+    <entry key="move-result">M</entry>
+    <entry key="move-result-object">M</entry>
+    <entry key="move-result-wide">M</entry>
+    <entry key="move-wide/16">M</entry>
+    <entry key="move-wide/from16">M</entry>
+    <entry key="move-wide">M</entry>
+    <entry key="move/16">M</entry>
+    <entry key="move/from16">M</entry>
+
+    <entry key="return">R</entry>
+    <entry key="return-object">R</entry>
+    <entry key="return-void">R</entry>
+    <entry key="return-wide">R</entry>
+
+    <entry key="goto">G</entry>
+    <entry key="goto/16">G</entry>
+    <entry key="goto/32">G</entry>
+
+    <entry key="if-eq">I</entry>
+    <entry key="if-eqz">I</entry>
+    <entry key="if-ge">I</entry>
+    <entry key="if-gez">I</entry>
+    <entry key="if-gt">I</entry>
+    <entry key="if-gtz">I</entry>
+    <entry key="if-le">I</entry>
+    <entry key="if-lez">I</entry>
+    <entry key="if-lt">I</entry>
+    <entry key="if-ltz">I</entry>
+    <entry key="if-ne">I</entry>
+    <entry key="if-nez">I</entry>
+
+
+    <entry key="aget">T</entry>
+    <entry key="aget-boolean">T</entry>
+    <entry key="aget-byte">T</entry>
+    <entry key="aget-char">T</entry>
+    <entry key="aget-object">T</entry>
+    <entry key="aget-short">T</entry>
+    <entry key="aget-wide">T</entry>
+
+    <entry key="iget">T</entry>
+    <entry key="iget-boolean">T</entry>
+    <entry key="iget-byte">T</entry>
+    <entry key="iget-char">T</entry>
+    <entry key="iget-object">T</entry>
+    <entry key="iget-object-quick">T</entry>
+    <entry key="iget-quick">T</entry>
+    <entry key="iget-short">T</entry>
+    <entry key="iget-wide">T</entry>
+    <entry key="iget-wide-quick">T</entry>
+
+    <entry key="sget">T</entry>
+    <entry key="sget-boolean">T</entry>
+    <entry key="sget-byte">T</entry>
+    <entry key="sget-char">T</entry>
+    <entry key="sget-object">T</entry>
+    <entry key="sget-short">T</entry>
+    <entry key="sget-wide">T</entry>
+
+    <entry key="aput">P</entry>
+    <entry key="aput-boolean">P</entry>
+    <entry key="aput-byte">P</entry>
+    <entry key="aput-char">P</entry>
+    <entry key="aput-object">P</entry>
+    <entry key="aput-short">P</entry>
+    <entry key="aput-wide">P</entry>
+
+    <entry key="iput">P</entry>
+    <entry key="iput-boolean">P</entry>
+    <entry key="iput-byte">P</entry>
+    <entry key="iput-char">P</entry>
+    <entry key="iput-object">P</entry>
+    <entry key="iput-object-quick">P</entry>
+    <entry key="iput-quick">P</entry>
+    <entry key="iput-short">P</entry>
+    <entry key="iput-wide">P</entry>
+    <entry key="iput-wide-quick">P</entry>
+
+    <entry key="sput">P</entry>
+    <entry key="sput-boolean">P</entry>
+    <entry key="sput-byte">P</entry>
+    <entry key="sput-char">P</entry>
+    <entry key="sput-object">P</entry>
+    <entry key="sput-short">P</entry>
+    <entry key="sput-wide">P</entry>
+
+
+    <entry key="invoke-direct">V</entry>
+    <entry key="invoke-direct-empty">V</entry>
+    <entry key="invoke-direct/range">V</entry>
+    <entry key="invoke-interface">V</entry>
+    <entry key="invoke-interface-range">V</entry>
+    <entry key="invoke-static">V</entry>
+    <entry key="invoke-static/range">V</entry>
+    <entry key="invoke-super">V</entry>
+    <entry key="invoke-super-quick">V</entry>
+    <entry key="invoke-super-quick/range">V</entry>
+    <entry key="invoke-super/range">V</entry>
+    <entry key="invoke-virtual">V</entry>
+    <entry key="invoke-virtual-quick">V</entry>
+    <entry key="invoke-virtual-quick/range">V</entry>
+    <entry key="invoke-virtual/range">V</entry>
+
+</map>
