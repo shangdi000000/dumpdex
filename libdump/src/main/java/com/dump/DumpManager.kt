@@ -12,6 +12,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import android.R.attr.versionCode
 import android.R.attr.versionName
+import io.reactivex.Observable
 
 
 /**
@@ -41,6 +42,7 @@ class DumpManager private constructor(var context: Context) {
      * 外部调用
      */
     fun dumpApk(hash: String, apkPath: String, packageName: String) {
+//        Observable.zip()
         async(CommonPool) {
             val ret = doDump(hash, apkPath, packageName)
             Log.e("----", "dumpApk ret =  $ret")
