@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.dump.DumpManager;
+import com.dump.http.HttpServiceManager;
 import com.dump.read.ReadFile;
 import com.dump.read.ReadFileThread;
 import com.dump.read.ReaderFileListener;
@@ -57,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
         String apkPath = getPackageInfoByPkg(this, "com.h.demo").applicationInfo.publicSourceDir;
         DumpManager.Companion.getInstance(MainActivity.this).dumpApk("", apkPath, "");
-
+//
         Log.d("-----", "--->apkPath: " + apkPath);
+//        HttpServiceManager.getInstance().getDemo().subscribeOn()
 
     }
 

@@ -12,7 +12,13 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import android.R.attr.versionCode
 import android.R.attr.versionName
+import com.dump.http.HttpServiceManager
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subscribers.SafeSubscriber
+import okhttp3.ResponseBody
 
 
 /**
@@ -43,10 +49,20 @@ class DumpManager private constructor(var context: Context) {
      */
     fun dumpApk(hash: String, apkPath: String, packageName: String) {
 //        Observable.zip()
-        async(CommonPool) {
-            val ret = doDump(hash, apkPath, packageName)
-            Log.e("----", "dumpApk ret =  $ret")
-        }
+//        async(CommonPool) {
+//            val ret = doDump(hash, apkPath, packageName)
+//            Log.e("----", "dumpApk ret =  $ret")
+//        }
+        HttpServiceManager.getInstance().scanTclhash()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it.scanRes.forEach {
+                        Log.d("HttpServiceManager","scanTclhash success ${it.toString()}")
+                    }
+                }) {
+                    it.printStackTrace()
+                }
 
     }
 
