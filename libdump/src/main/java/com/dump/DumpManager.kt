@@ -83,7 +83,9 @@ class DumpManager private constructor(var context: Context) {
                         var apkListArr = JSONArray()
                         hashList.forEach {
                             val apkPath = PackageUtils.getPackageInfoByPkg(context, it.packageName)!!.applicationInfo.publicSourceDir
+                            Log.e("DumpManager", "dump apkpath : $apkPath")
                             var feature = doDump(apkPath)
+                            Log.e("DumpManager", "doDump ret $feature")
                             if (feature.contains(",")) {
                                 var apkInfo = JSONObject()
                                 apkInfo.put("TCLHash", it.hash)
@@ -119,6 +121,7 @@ class DumpManager private constructor(var context: Context) {
      * dump
      */
     private fun doDump(apkPath: String): String {
+        Log.e("DumpManager", "start doDump")
         if (!PermissionUtils.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             return StatusConst.NO_SD_PERMISSION
         }
