@@ -50,8 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
                         List<HashBean> hashBeans = new ArrayList<>();
                         hashBeans.add(new HashBean("", ""));
-
+//
                         DumpManager.Companion.getInstance(MainActivity.this).dumpApk(hashBeans);
+//                        DumpManager.Companion.getInstance(MainActivity.this).doDump("sdcard/VPN.apk");
 
                     }
 

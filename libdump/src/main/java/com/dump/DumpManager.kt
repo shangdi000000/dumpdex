@@ -29,7 +29,7 @@ import java.security.MessageDigest
 class DumpManager private constructor(var context: Context) {
 
     private var dicGroupList = ArrayList<String>()
-    private val unzipFilePath = "sdcard/SecurityEngine"
+//    private var unzipFilePath = "sdcard/SecurityEngine"
     private var startRead: Long = 0
     private var charDic: MutableMap<String, String> = HashMap()
     private var protectDic: MutableMap<String, String> = HashMap()
@@ -120,6 +120,8 @@ class DumpManager private constructor(var context: Context) {
 
         //解压
         var start = System.currentTimeMillis()
+        var unzipFilePath = "sdcard/SecurityEngine/${System.currentTimeMillis()}"
+
         var apkFile = File(apkPath)
         if (!apkFile.exists()) {
             return StatusConst.FILE_NOT_EXIT
@@ -184,104 +186,6 @@ class DumpManager private constructor(var context: Context) {
 
 
     /**
-     * 线程池计算
-     */
-    private fun caculateFileMix(dexFile: File): String {
-        var start = System.currentTimeMillis()
-        val cmdStr = "dexdump -d ${dexFile.absolutePath} > $unzipFilePath/${dexFile.name}.txt"
-        var cmdRet = ShellUtils.execCmd(cmdStr, false)
-        Log.e("----", "cmd ret success -> ${cmdRet.successMsg}, failure -> ${cmdRet.errorMsg}")
-        var dump = System.currentTimeMillis()
-        Log.e("----", "dump time  ${dump - start}")
-        var txtFile = File("$unzipFilePath/${dexFile.name}.txt")
-
-        var fis: FileInputStream? = null
-        try {
-            val readFile = ReadFile()
-            fis = FileInputStream(txtFile)
-            val available = fis.available()
-            val maxThreadNum = 10
-            // 线程粗略开始位置
-            val i = available / maxThreadNum
-
-
-            val fixedThreadPool = Executors.newFixedThreadPool(maxThreadNum)
-            var map = HashMap<Int, String>()
-            for (j in 0 until maxThreadNum) {
-                val startNum = if (j == 0) 0 else readFile.getStartNum(txtFile, (i * j).toLong())
-                val endNum = if (j + 1 < maxThreadNum) readFile.getStartNum(txtFile, (i * (j + 1)).toLong()) else -2
-
-                fixedThreadPool.execute {
-                    val readFile = ReadFile()
-                    var charSb = StringBuilder()
-                    try {
-                        var outStrList = readFile.readFileByLine(txtFile.absolutePath, startNum, endNum + 1)
-                        outStrList.forEach {
-                            if (charDic[it] != null) {
-                                charSb.append(charDic[it])
-                            }
-                        }
-                        Log.e("DumpManager", "out str ${charSb.toString()}")
-                        map[j] = charSb.toString()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-
-            }
-            fixedThreadPool.shutdown()
-            try {//等待直到所有任务完成
-                fixedThreadPool.awaitTermination(java.lang.Long.MAX_VALUE, TimeUnit.MINUTES)
-                var retSb = StringBuilder();
-                map.forEach {
-                    retSb.append(it.value)
-                }
-                return retSb.toString()
-
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            }
-
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return ""
-
-    }
-
-    /**
-     * 单线程计算
-     */
-    private fun caculateFile(dexFile: File, sb: StringBuilder) {
-        var start = System.currentTimeMillis()
-        val cmdStr = "dexdump -d ${dexFile.absolutePath} > $unzipFilePath/${dexFile.name}.txt"
-        ShellUtils.execCmd(cmdStr, false)
-        var dump = System.currentTimeMillis()
-        Log.e("----", "dump time  ${dump - start}")
-
-        var txtFile = File("$unzipFilePath/${dexFile.name}.txt")
-        startRead = System.currentTimeMillis()
-        txtFile.forEachLine {
-            if (it.contains("\\|".toRegex())) {
-                var strArr = it.split("\\|".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                if (strArr.size > 1) {
-                    var indexArr = strArr[1].split("\\s".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    if (indexArr.size > 1) {
-                        if (charDic.containsKey(indexArr[1])) {
-                            Log.e("----", "file path ${indexArr[1]}")
-                            sb.append(charDic[indexArr[1]])
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * newest
      */
 
@@ -291,11 +195,12 @@ class DumpManager private constructor(var context: Context) {
 
         Log.e("----", "chmod cmd error : " + ret.errorMsg + ", succss : " + ret.successMsg)
 
-        val cmdStr = "$dumpCmdFilePath -d ${dexFile.absolutePath} > $unzipFilePath/${dexFile.name}.txt"
+        val cmdStr = "$dumpCmdFilePath -d ${dexFile.absolutePath} > ${dexFile.parent}/${dexFile.name}.txt"
         val ret1 = ShellUtils.execCmd(cmdStr, false)
+        Log.e("----", "dump $cmdStr ")
         Log.e("----", "dump cmd error : " + ret1.errorMsg + ", succss : " + ret1.successMsg)
 
-        var txtFile = File("$unzipFilePath/${dexFile.name}.txt")
+        var txtFile = File("${dexFile.parent}/${dexFile.name}.txt")
         var txtContent = txtFile.readText()
         return if (txtContent.contains("verified")) {
             txtContent.substringAfterLast("verified")
