@@ -3,17 +3,15 @@ package com.dump
 import android.Manifest
 import android.content.Context
 import android.util.Log
-import com.dump.read.ReadFile
 import com.dump.utils.*
 import java.util.regex.Pattern
 import java.io.*
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import android.content.pm.PackageManager
 import com.dump.bean.ApkResult
 import com.dump.bean.HashBean
 import com.dump.http.ApiResponse
 import com.dump.http.HttpServiceManager
+import com.dump.listener.DumpListener
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Function
@@ -49,7 +47,7 @@ class DumpManager private constructor(var context: Context) {
     /**
      * 外部调用
      */
-    fun dumpApk(hashList: List<HashBean>) {
+    fun dumpApk(hashList: List<HashBean>, listener: DumpListener) {
         HttpServiceManager.getInstance().scanTclhash(hashList, context.packageName)
                 .flatMap(Function<ApiResponse<List<ApkResult>>, ObservableSource<List<ApkResult>>> {
                     var firstResult = it.scanRes
@@ -95,12 +93,10 @@ class DumpManager private constructor(var context: Context) {
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it.forEach {
-                        Log.e("DumpManager", "result : ${it.toString()}")
-                    }
-
+                    listener.dumpSuccess(it)
                 }) {
                     it.printStackTrace()
+                    listener.dumpFailure(it)
                 }
 
     }
