@@ -14,6 +14,10 @@ public class ApiResponse<T> {
     @SerializedName("ScanRes")
     public T scanRes;
 
+    public boolean isSuccess(){
+        return "0".equals(status);
+    }
+
     @Override
     public String toString() {
         return "ApiResponse{" +

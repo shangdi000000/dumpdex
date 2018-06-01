@@ -13,4 +13,28 @@ public class ApkResult {
     public String risk;
     @SerializedName("VirusName")
     public String virusName;
+
+    public String dumpRet = "0";
+
+    public boolean needDump(){
+        return "-1".equals(risk);
+    }
+
+
+    public ApkResult(String tCLHash, String risk, String virusName, String dumpRet) {
+        this.tCLHash = tCLHash;
+        this.risk = risk;
+        this.virusName = virusName;
+        this.dumpRet = dumpRet;
+    }
+
+    @Override
+    public String toString() {
+        return "ApkResult{" +
+                "tCLHash='" + tCLHash + '\'' +
+                ", risk='" + risk + '\'' +
+                ", virusName='" + virusName + '\'' +
+                ", dumpRet='" + dumpRet + '\'' +
+                '}';
+    }
 }

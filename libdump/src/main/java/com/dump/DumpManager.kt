@@ -12,13 +12,22 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import android.R.attr.versionCode
 import android.R.attr.versionName
+import android.content.pm.PackageManager
+import com.dump.bean.ApkResult
+import com.dump.bean.HashBean
+import com.dump.http.ApiResponse
 import com.dump.http.HttpServiceManager
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.SafeSubscriber
 import okhttp3.ResponseBody
+import org.json.JSONArray
+import org.json.JSONObject
+import java.security.MessageDigest
 
 
 /**
@@ -32,6 +41,7 @@ class DumpManager private constructor(var context: Context) {
     private var charDic: MutableMap<String, String> = HashMap()
     private var protectDic: MutableMap<String, String> = HashMap()
     private lateinit var dumpCmdFilePath: String
+    private var result = ArrayList<ApkResult>()
 
     companion object {
         private var instance: DumpManager? = null
@@ -47,19 +57,54 @@ class DumpManager private constructor(var context: Context) {
     /**
      * 外部调用
      */
-    fun dumpApk(hash: String, apkPath: String, packageName: String) {
-//        Observable.zip()
-//        async(CommonPool) {
-//            val ret = doDump(hash, apkPath, packageName)
-//            Log.e("----", "dumpApk ret =  $ret")
-//        }
-        HttpServiceManager.getInstance().scanTclhash()
-                .subscribeOn(Schedulers.io())
+    fun dumpApk(hashList: List<HashBean>) {
+        result.clear()
+
+        HttpServiceManager.getInstance().scanTclhash(hashList, context.packageName)
+                .flatMap(Function<ApiResponse<List<ApkResult>>, ObservableSource<List<ApkResult>>> {
+                    var firstResult = it.scanRes
+                    var needDumpList = firstResult.filter { it.needDump() }
+
+                    if (needDumpList.isEmpty()) {
+                        return@Function ObservableSource<List<ApkResult>> {
+                            it.onNext(firstResult)
+                            it.onComplete()
+                        }
+                    } else {
+                        needDumpList.forEach {
+                            var apkResult = it
+                            hashList.dropWhile {
+                                it.hash == apkResult.tCLHash
+                            }
+                        }
+                        var apkListArr = JSONArray()
+                        hashList.forEach {
+                            val apkPath = PackageUtils.getPackageInfoByPkg(context, it.packageName)!!.applicationInfo.publicSourceDir
+                            var feature = doDump(apkPath)
+                            if (feature.contains(",")) {
+                                var apkInfo = JSONObject()
+                                apkInfo.put("TCLHash", it.hash)
+                                apkInfo.put("PkgName", it.packageName)
+                                apkInfo.put("Feature", feature)
+                                apkInfo.put("SigMd5", getSigHash(it.packageName))
+                                apkListArr.put(apkInfo)
+
+                            } else {
+                                result.add(ApkResult(it.hash, "-1", "-1", feature))
+                            }
+                        }
+                        return@Function HttpServiceManager.getInstance().scanFeature(apkListArr, context.packageName)
+                    }
+
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it.scanRes.forEach {
-                        Log.d("HttpServiceManager","scanTclhash success ${it.toString()}")
+                    result.addAll(it)
+
+                    result.forEach {
+                        Log.e("DumpManager", "result : ${it.toString()}")
                     }
+
                 }) {
                     it.printStackTrace()
                 }
@@ -70,7 +115,7 @@ class DumpManager private constructor(var context: Context) {
     /**
      * dump
      */
-    private fun doDump(hash: String, apkPath: String, packageName: String): Int {
+    private fun doDump(apkPath: String): String {
         if (!PermissionUtils.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             return StatusConst.NO_SD_PERMISSION
         }
@@ -128,14 +173,18 @@ class DumpManager private constructor(var context: Context) {
             Log.e("----", "result str $charSb")
         }
 
-        dicGroupList.forEach {
+        var result = StringBuilder()
+        dicGroupList.forEachIndexed { index, it ->
             var appearNum = appearNumber(charSb.toString(), it)
-            Log.e("----", "$it appear $appearNum times")
+            if (index != 0) {
+                result.append(",")
+            }
+            result.append(appearNum)
         }
 
         FileUtils.deleteDir(unzipFilePath)
         Log.e("----", "all read time  ${System.currentTimeMillis() - startRead}")
-        return StatusConst.DUMP_SUUCESS
+        return result.toString()
     }
 
 
@@ -298,5 +347,38 @@ class DumpManager private constructor(var context: Context) {
         protectDic = MapUtils.getHashMapResource(context, R.xml.protect_dic)
 
     }
+
+    fun getSigHash(pkgName: String): String {
+        try {
+            var pkg = context.packageManager.getPackageInfo(pkgName, PackageManager.GET_SIGNATURES)
+            var digest: MessageDigest? = null
+            try {
+                digest = MessageDigest.getInstance("MD5")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return ""
+            }
+            val bytes = pkg.signatures[0].toByteArray()
+            digest.update(bytes)
+            return digestToString(digest.digest())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
+
+    private fun digestToString(dig: ByteArray): String {
+        var builder = StringBuilder()
+        for (i in dig.indices) {
+            var k = dig[i].toInt()
+            if (k < 0) {
+                k += 256
+            }
+            builder.append(String.format("%02X", k))
+        }
+        return builder.toString()
+    }
+
 
 }

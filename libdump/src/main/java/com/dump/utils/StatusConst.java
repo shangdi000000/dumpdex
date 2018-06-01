@@ -5,11 +5,11 @@ package com.dump.utils;
  */
 
 public class StatusConst {
-    public static final int NO_SD_PERMISSION = -2;
-    public static final int FILE_NOT_EXIT = -1;
-    public static final int DUMP_SUUCESS = 0;
-    public static final int APK_IS_PROTECT = 1;
-    public static final int DEX_FILES_TOO_MANY = 2;
-    public static final int DEX_FILES_TOO_LARGE = 3;
+    public static final String NO_SD_PERMISSION = "-2";
+    public static final String FILE_NOT_EXIT = "-1";
+    public static final String DUMP_SUUCESS = "0";
+    public static final String APK_IS_PROTECT = "1";
+    public static final String DEX_FILES_TOO_MANY = "2";
+    public static final String DEX_FILES_TOO_LARGE = "3";
 
 }

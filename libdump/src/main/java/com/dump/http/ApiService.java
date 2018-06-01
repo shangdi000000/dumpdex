@@ -24,8 +24,7 @@ import retrofit2.http.Path;
 public interface ApiService {
 
     @POST("v1.0/scan_feature")
-    Observable<ResponseBody> scanFeature(@FieldMap Map<String, String> paramMap);
-
+    Observable<ApiResponse<List<ApkResult>>> scanFeature(@Body RequestBody body);
     @POST("v1.0/scan_tclhash")
     Observable<ApiResponse<List<ApkResult>>> scanTclhash(@Body RequestBody body);
 }

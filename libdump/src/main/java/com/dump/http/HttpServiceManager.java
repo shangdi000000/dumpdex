@@ -3,6 +3,7 @@ package com.dump.http;
 import android.util.Log;
 
 import com.dump.bean.ApkResult;
+import com.dump.bean.HashBean;
 import com.dump.utils.RetrofitLogger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,6 +16,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.functions.Function;
 import okhttp3.ConnectionPool;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -64,24 +68,18 @@ public class HttpServiceManager {
     }
 
 
-    public Observable<ApiResponse<List<ApkResult>>> scanTclhash() {
+    public Observable<ApiResponse<List<ApkResult>>> scanTclhash(List<HashBean> hashList, String appPackageName) {
 
 
         JSONObject result = new JSONObject();
         try {
             JSONArray hashJson = new JSONArray();
-            hashJson.put("ABCDEF1234567890");
-            hashJson.put("ABCDEF1234567891");
+            for (HashBean bean : hashList) {
+                hashJson.put(bean.hash);
+            }
             Log.d("HttpServiceManager", "TCLHashList : " + hashJson.toString());
-            result.put("TCLHashList", hashJson.toString());
-
-
-            JSONObject sdkJson = new JSONObject();
-            sdkJson.put("PkgName", "com.h.application");
-            sdkJson.put("VersionName", "v1.0.0");
-            sdkJson.put("VersionCode", "1");
-            Log.d("HttpServiceManager", "AiEngineSDK : " + sdkJson.toString());
-            result.put("AiEngineSDK", sdkJson.toString());
+            result.put("TCLHashList", hashJson);
+            result.put("AiEngineSDK", getSdkEngine(appPackageName));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -91,9 +89,62 @@ public class HttpServiceManager {
     }
 
 
+    public Observable<List<ApkResult>> scanFeature(JSONArray apklist, String appPackageName) {
+
+
+        JSONObject result = new JSONObject();
+        try {
+            Log.d("HttpServiceManager", "TCLHashList : " + apklist.toString());
+            result.put("ApkList", apklist.toString());
+            result.put("AiEngineSDK", getSdkEngine(appPackageName));
+            result.put("Basic", new JSONObject().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), result.toString());
+
+        return getService().scanFeature(body).flatMap(new Function<ApiResponse<List<ApkResult>>, ObservableSource<List<ApkResult>>>() {
+            @Override
+            public ObservableSource<List<ApkResult>> apply(final ApiResponse<List<ApkResult>> listApiResponse) throws Exception {
+                if (listApiResponse.isSuccess()){
+                    return new ObservableSource<List<ApkResult>>() {
+                        @Override
+                        public void subscribe(Observer<? super List<ApkResult>> observer) {
+                            observer.onNext(listApiResponse.scanRes);
+                            observer.onComplete();
+                        }
+                    };
+                } else {
+                    return new ObservableSource<List<ApkResult>>() {
+                        @Override
+                        public void subscribe(Observer<? super List<ApkResult>> observer) {
+                            observer.onError(new RuntimeException("error code : " + listApiResponse.status));
+                        }
+                    };
+                }
+
+            }
+        });
+    }
+
+
+
+
     private ApiService getService() {
         return mRetrofit.create(ApiService.class);
     }
 
+    private JSONObject getSdkEngine(String appPackageName){
 
+        JSONObject sdkJson = new JSONObject();
+        try {
+            sdkJson.put("PkgName", appPackageName);
+            sdkJson.put("VersionName", "v1.0.0");
+            sdkJson.put("VersionCode", "1");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("HttpServiceManager", "AiEngineSDK : " + sdkJson.toString());
+        return sdkJson;
+    }
 }
