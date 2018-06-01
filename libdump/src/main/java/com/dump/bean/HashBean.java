@@ -12,4 +12,12 @@ public class HashBean {
         this.packageName = packageName;
         this.hash = hash;
     }
+
+    @Override
+    public String toString() {
+        return "HashBean{" +
+                "packageName='" + packageName + '\'' +
+                ", hash='" + hash + '\'' +
+                '}';
+    }
 }

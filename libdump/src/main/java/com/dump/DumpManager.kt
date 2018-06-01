@@ -72,10 +72,13 @@ class DumpManager private constructor(var context: Context) {
                         }
                     } else {
                         needDumpList.forEach {
-                            var apkResult = it
-                            hashList.dropWhile {
-                                it.hash == apkResult.tCLHash
+                            var needDumpApk = it
+                            hashList.filter {
+                                it.hash == needDumpApk.tCLHash
                             }
+                        }
+                        hashList.forEach {
+                            Log.e("DumpManager", "need dump apk : $it")
                         }
                         var apkListArr = JSONArray()
                         hashList.forEach {
