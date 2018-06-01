@@ -42,10 +42,24 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClick(View view) {
 
-        List<HashBean> hashBeans = new ArrayList<>();
-        hashBeans.add(new HashBean("", ""));
 
-        DumpManager.Companion.getInstance(MainActivity.this).dumpApk(hashBeans);
+            PermissionUtils.permission(PermissionConstants.STORAGE)
+                .callback(new PermissionUtils.SimpleCallback() {
+                    @Override
+                    public void onGranted() {
+
+                        List<HashBean> hashBeans = new ArrayList<>();
+                        hashBeans.add(new HashBean("", ""));
+
+                        DumpManager.Companion.getInstance(MainActivity.this).dumpApk(hashBeans);
+
+                    }
+
+                    @Override
+                    public void onDenied() {
+
+                    }
+                }).request();
 
     }
 

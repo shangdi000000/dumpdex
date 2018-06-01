@@ -95,9 +95,9 @@ public class HttpServiceManager {
         JSONObject result = new JSONObject();
         try {
             Log.d("HttpServiceManager", "TCLHashList : " + apklist.toString());
-            result.put("ApkList", apklist.toString());
+            result.put("ApkList", apklist);
             result.put("AiEngineSDK", getSdkEngine(appPackageName));
-            result.put("Basic", new JSONObject().toString());
+            result.put("Basic", new JSONObject());
         } catch (JSONException e) {
             e.printStackTrace();
         }
