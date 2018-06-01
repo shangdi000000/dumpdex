@@ -5,26 +5,19 @@ import android.content.Context
 import android.util.Log
 import com.dump.read.ReadFile
 import com.dump.utils.*
-import kotlinx.coroutines.experimental.*
 import java.util.regex.Pattern
 import java.io.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import android.R.attr.versionCode
-import android.R.attr.versionName
 import android.content.pm.PackageManager
 import com.dump.bean.ApkResult
 import com.dump.bean.HashBean
 import com.dump.http.ApiResponse
 import com.dump.http.HttpServiceManager
-import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subscribers.SafeSubscriber
-import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.MessageDigest
@@ -41,7 +34,6 @@ class DumpManager private constructor(var context: Context) {
     private var charDic: MutableMap<String, String> = HashMap()
     private var protectDic: MutableMap<String, String> = HashMap()
     private lateinit var dumpCmdFilePath: String
-    private var result = ArrayList<ApkResult>()
 
     companion object {
         private var instance: DumpManager? = null
@@ -58,8 +50,6 @@ class DumpManager private constructor(var context: Context) {
      * 外部调用
      */
     fun dumpApk(hashList: List<HashBean>) {
-        result.clear()
-
         HttpServiceManager.getInstance().scanTclhash(hashList, context.packageName)
                 .flatMap(Function<ApiResponse<List<ApkResult>>, ObservableSource<List<ApkResult>>> {
                     var firstResult = it.scanRes
@@ -81,6 +71,7 @@ class DumpManager private constructor(var context: Context) {
                             Log.e("DumpManager", "need dump apk : $it")
                         }
                         var apkListArr = JSONArray()
+                        var dumpFailList = ArrayList<ApkResult>()
                         hashList.forEach {
                             val apkPath = PackageUtils.getPackageInfoByPkg(context, it.packageName)!!.applicationInfo.publicSourceDir
                             Log.e("DumpManager", "dump apkpath : $apkPath")
@@ -95,18 +86,16 @@ class DumpManager private constructor(var context: Context) {
                                 apkListArr.put(apkInfo)
 
                             } else {
-                                result.add(ApkResult(it.hash, "-1", "-1", feature))
+                                dumpFailList.add(ApkResult(it.hash, "-1", "-1", feature))
                             }
                         }
-                        return@Function HttpServiceManager.getInstance().scanFeature(apkListArr, context.packageName)
+                        return@Function HttpServiceManager.getInstance().scanFeature(apkListArr, context.packageName, dumpFailList)
                     }
 
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    result.addAll(it)
-
-                    result.forEach {
+                    it.forEach {
                         Log.e("DumpManager", "result : ${it.toString()}")
                     }
 

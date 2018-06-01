@@ -89,8 +89,16 @@ public class HttpServiceManager {
     }
 
 
-    public Observable<List<ApkResult>> scanFeature(JSONArray apklist, String appPackageName) {
-
+    public ObservableSource<List<ApkResult>> scanFeature(JSONArray apklist, String appPackageName, final List<ApkResult> dumpFailure) {
+        if (apklist.length() == 0) {
+            return new ObservableSource<List<ApkResult>>() {
+                @Override
+                public void subscribe(Observer<? super List<ApkResult>> observer) {
+                    observer.onNext(dumpFailure);
+                    observer.onComplete();
+                }
+            };
+        }
 
         JSONObject result = new JSONObject();
         try {
@@ -110,7 +118,8 @@ public class HttpServiceManager {
                     return new ObservableSource<List<ApkResult>>() {
                         @Override
                         public void subscribe(Observer<? super List<ApkResult>> observer) {
-                            observer.onNext(listApiResponse.scanRes);
+                            dumpFailure.addAll(listApiResponse.scanRes);
+                            observer.onNext(dumpFailure);
                             observer.onComplete();
                         }
                     };
