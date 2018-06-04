@@ -81,6 +81,9 @@ class DumpManager private constructor(var context: Context) {
                                 apkInfo.put("PkgName", it.packageName)
                                 apkInfo.put("Feature", feature)
                                 apkInfo.put("SigMd5", getSigHash(it.packageName))
+                                apkInfo.put("PkgVersion", "-")
+                                apkInfo.put("PkgSize", "-")
+                                apkInfo.put("SigName", "-")
                                 apkListArr.put(apkInfo)
 
                             } else {

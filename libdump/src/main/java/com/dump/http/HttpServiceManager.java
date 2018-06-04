@@ -105,7 +105,7 @@ public class HttpServiceManager {
             Log.d("HttpServiceManager", "TCLHashList : " + apklist.toString());
             result.put("ApkList", apklist);
             result.put("AiEngineSDK", getSdkEngine(appPackageName));
-            result.put("Basic", new JSONObject());
+            result.put("Basic", getBasic());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,6 +150,36 @@ public class HttpServiceManager {
             sdkJson.put("PkgName", appPackageName);
             sdkJson.put("VersionName", "v1.0.0");
             sdkJson.put("VersionCode", "1");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("HttpServiceManager", "AiEngineSDK : " + sdkJson.toString());
+        return sdkJson;
+    }
+
+    /**
+     * Basic : {                  // 手机信息
+         Brand      string      // 手机品牌
+         Model      string      // 手机型号
+         Language   string      // 手机设置的语言
+         Country    string      // 手机当前国家
+         NetWork    string      // "2G|3G|4G|5G|WIFI"
+         AndoridID  string      // 安卓ID
+         AndroidSDK string      // 安卓SDK版本
+     }
+     * @return
+     */
+    private JSONObject getBasic(){
+
+        JSONObject sdkJson = new JSONObject();
+        try {
+            sdkJson.put("Brand", "-");
+            sdkJson.put("Model", "-");
+            sdkJson.put("Language", "-");
+            sdkJson.put("Country", "-");
+            sdkJson.put("NetWork", "-");
+            sdkJson.put("AndoridID", "-");
+            sdkJson.put("AndroidSDK", "-");
         } catch (JSONException e) {
             e.printStackTrace();
         }
